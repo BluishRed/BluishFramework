@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -9,9 +8,8 @@ using Microsoft.Xna.Framework.Content;
 
 namespace BluishFramework
 {
-    public abstract class System : IUpdateable
+    public abstract class System
     {
-        public bool ShouldUpdate { get; set; } = true;
 
         private HashSet<int> _registeredEntities;
         private readonly List<Type> _requiredComponents;
@@ -24,7 +22,20 @@ namespace BluishFramework
 
         public void Update(GameTime gameTime)
         {
+            foreach (Entity entity in Entities)
+            {
+                UpdateEntity(entity, gameTime);
+            }
+        }
 
+        protected abstract void UpdateEntity(Entity entity, GameTime gameTime);
+
+        public virtual void DeleteEntity(int id)
+        {
+            if (_registeredEntities.Contains(id))
+            {
+                _registeredEntities.Remove(id);
+            }
         }
 
         public void UpdateEntityRegistration(Entity entity)
