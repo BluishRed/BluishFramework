@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -11,20 +12,28 @@ namespace BluishFramework
     public abstract class System
     {
 
+        private World _world;
+        /// <summary>
+        /// Entities that match the signature of this <see cref="System"/> from the <see cref="World"/>
+        /// </summary>
         private HashSet<int> _registeredEntities;
         private readonly List<Type> _requiredComponents;
 
-        public System()
+        public System(World world)
         {
             _registeredEntities = new HashSet<int>();
             _requiredComponents = new List<Type>();
+            _world = world;
         }
 
-        public void Update(GameTime gameTime)
+        /// <summary>
+        /// Updates all the entities that match the signature of this <see cref="System"/> from the <see cref="World"/>
+        /// </summary>
+        public void UpdateEntities(GameTime gameTime)
         {
-            foreach (Entity entity in Entities)
+            foreach (int id in _registeredEntities)
             {
-                UpdateEntity(entity, gameTime);
+                UpdateEntity(_world.GetEntity(id), gameTime);
             }
         }
 
@@ -38,6 +47,10 @@ namespace BluishFramework
             }
         }
 
+        /// <summary>
+        /// Evaluates <paramref name="entity"/>'s components and adds it to this <see cref="System"/> if it meets the signature,
+        /// Or removes it from this <see cref="System"/> if the entity was registered but no longer matches the signature
+        /// </summary>
         public void UpdateEntityRegistration(Entity entity)
         {
             bool matches = Matches(entity);
@@ -59,11 +72,14 @@ namespace BluishFramework
             _requiredComponents.Add(typeof(T));
         }
 
+        /// <returns>
+        /// <c>true</c> if the entity matches this <see cref="System"/>'s signature, <c>false</c> otherwise
+        /// </returns>
         private bool Matches(Entity entity)
         {
             foreach (Type component in _requiredComponents)
             {
-                if (entity.HasComponent(component))
+                if (!entity.HasComponent(component))
                     return false;
             }
             return true;

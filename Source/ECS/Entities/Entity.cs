@@ -14,6 +14,7 @@ namespace BluishFramework
     /// </summary>
     public class Entity
     {
+
         private Dictionary<Type, Component> _components;
 
         public int ID { get; private set; }
@@ -33,6 +34,26 @@ namespace BluishFramework
         internal void AddComponent(Component component)
         {
             _components[component.GetType()] = component;
+            OnComponentsChanged();
+        }
+
+        internal void AddComponents(params Component[] components)
+        {
+            foreach (Component component in components)
+            {
+                AddComponent(component);
+            }
+        }
+
+        internal void RemoveComponent<T>()
+        {
+            _components.Remove(typeof(T));
+            OnComponentsChanged();
+        }
+
+        protected void OnComponentsChanged()
+        {
+            
         }
 
         /// <summary>
@@ -69,6 +90,12 @@ namespace BluishFramework
         public bool HasComponent(Type componentType)
         {
             return _components.ContainsKey(componentType);
+        }
+
+        public static Entity operator +(Entity entity, Component component)
+        {
+            entity.AddComponent(component);
+            return entity;
         }
     }
 }
