@@ -12,6 +12,7 @@ namespace BluishFramework
     public class World
     {
         private Dictionary<int, ComponentCollection> _entities;
+        private List<int> _entitesToRemove;
         private Dictionary<Type, System> _systems;
         private int _currentID;
 
@@ -19,6 +20,8 @@ namespace BluishFramework
         {
             _systems = new Dictionary<Type, System>();
             _entities = new Dictionary<int, ComponentCollection>();
+            _entitesToRemove = new List<int>();
+            _currentID = 0;
         }
 
         public void AddEntity(params Component[] components)
@@ -30,14 +33,24 @@ namespace BluishFramework
                 componentCollection.AddComponent(component);
             }
 
-            _entities.Add(_currentID, componentCollection);
-
-            UpdateEntityRegistration(_currentID++);
+            _entities.Add(_currentID++, componentCollection);
         }
 
-        public void DeleteEntity(int entity)
+        public void RemoveEntity(int entity)
         {
-            
+            _entitesToRemove.Add(entity);
+        }
+
+        public void AddComponent(int entity, Component component)
+        {
+            _entities[entity].AddComponent(component);
+            UpdateEntityRegistration(entity);
+        }
+
+        public ComponentCollection GetComponents(int entity)
+        {
+            // TODO: Ensure entity exists
+            return _entities[entity];
         }
 
         public void AddSystem<T>() where T : System
@@ -50,12 +63,28 @@ namespace BluishFramework
             return (T)_systems[typeof(T)];
         }
 
+        public void RemoveSystem<T>() where T : System
+        {
+            _systems.Remove(typeof(T));
+        }
+
         public void Update(GameTime gameTime)
         {
             foreach (System system in _systems.Values)
             {
                 system.UpdateEntities(gameTime);
             }
+
+            foreach (int entity in _entitesToRemove)
+            {
+                DestroyEntity(entity);
+            }
+        }
+
+        private void DestroyEntity(int entity)
+        {
+            _entitesToRemove.Remove(entity);
+            _entities.Remove(entity);
         }
 
         private void UpdateEntityRegistration(int entity)

@@ -11,12 +11,9 @@ namespace BluishFramework
 {
     public abstract class System : EntityRegister
     {
-        
-        private World _world;
-
-        public System(World world)
+        public System(World world, params Type[] requiredComponents) : base(world, requiredComponents)
         {
-            _world = world;    
+             
         }
 
         /// <summary>
