@@ -8,11 +8,16 @@ using Microsoft.Xna.Framework.Content;
 
 namespace BluishFramework
 {
-    public abstract class State
+    public abstract class State : World
     {
         public State()
         {
             
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+
         }
     }
 }

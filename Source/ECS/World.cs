@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Collections;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,39 +11,33 @@ namespace BluishFramework
 {
     public class World
     {
-
-        private Dictionary<int, Entity> _entities;
-        private List<int> _entitiesToDelete;
+        private Dictionary<int, ComponentCollection> _entities;
         private Dictionary<Type, System> _systems;
         private int _currentID;
 
         public World()
         {
-            _entities = new Dictionary<int, Entity>();
-            _entitiesToDelete = new List<int>();
             _systems = new Dictionary<Type, System>();
+            _entities = new Dictionary<int, ComponentCollection>();
         }
 
-        public Entity AddEntity()
+        public void AddEntity(params Component[] components)
         {
-            Entity entity = new Entity(_currentID);
-            _entities[++_currentID] = entity;
-            return entity;
+            ComponentCollection componentCollection = new ComponentCollection();
+            
+            foreach(Component component in components)
+            {
+                componentCollection.AddComponent(component);
+            }
+
+            _entities.Add(_currentID, componentCollection);
+
+            UpdateEntityRegistration(_currentID++);
         }
 
-        public void DeleteEntity(int id)
+        public void DeleteEntity(int entity)
         {
-            _entitiesToDelete.Add(id);
-        }
-
-        public Entity GetEntity(int id)
-        {
-            return _entities[id];
-        }
-
-        public bool DoesEntityExist(int id)
-        {
-            return _entities.ContainsKey(id);
+            
         }
 
         public void AddSystem<T>() where T : System
@@ -63,7 +58,7 @@ namespace BluishFramework
             }
         }
 
-        private void UpdateEntityRegistration(Entity entity)
+        private void UpdateEntityRegistration(int entity)
         {
             foreach (System system in _systems.Values)
             {
