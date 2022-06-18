@@ -39,6 +39,19 @@ namespace BluishFramework
             return _components[typeof(T)] as T;
         }
 
+        public List<Component> GetComponents(Type[] componentTypes)
+        {
+            List<Component> components = new List<Component>();
+
+            foreach (Type componentType in componentTypes)
+            {
+                _components.TryGetValue(componentType, out Component component);
+                components.Add(component);
+            }
+
+            return components;
+        }
+
         public bool HasComponent<T>() where T : Component
         {
             return _components.ContainsKey(typeof(T));

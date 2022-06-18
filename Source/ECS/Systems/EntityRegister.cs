@@ -11,17 +11,15 @@ namespace BluishFramework
 {
     public class EntityRegister
     {
-
-        private readonly Type[] _requiredComponents;
-        private World _world;
-
+        protected Type[] RequiredComponents { get; private set; }
+        protected World World { get; private set; }
         private protected HashSet<int> RegisteredEntities { get; private set; }
 
         public EntityRegister(World world, params Type[] requiredComponents)
         {
             RegisteredEntities = new HashSet<int>();
-            _requiredComponents = requiredComponents;
-            _world = world;
+            RequiredComponents = requiredComponents;
+            World = world;
         }
 
         public virtual void DeleteEntity(int id)
@@ -57,14 +55,7 @@ namespace BluishFramework
         /// </returns>
         private bool Matches(int entity)
         {
-            ComponentCollection components = _world.GetComponents(entity);
-
-            foreach (Type component in _requiredComponents)
-            {
-                if (!components.HasComponent(component))
-                    return false;
-            }
-            return true;
+            return World.GetComponents(entity).HasComponents(RequiredComponents);
         }
     }
 }

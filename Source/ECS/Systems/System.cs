@@ -23,10 +23,10 @@ namespace BluishFramework
         {
             foreach (int entity in RegisteredEntities)
             {
-                UpdateEntity(entity, gameTime);
+                UpdateEntity(gameTime, World.GetComponents(entity).GetComponents(RequiredComponents));
             }
         }
 
-        protected abstract void UpdateEntity(int entity, GameTime gameTime);
+        protected abstract void UpdateEntity(GameTime gameTime, List<Component> components);
     }
 }
