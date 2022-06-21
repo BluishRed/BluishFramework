@@ -9,24 +9,53 @@ using Microsoft.Xna.Framework.Content;
 
 namespace BluishFramework
 {
-    public abstract class System : EntityRegister
+    public class System
     {
-        public System(World world, params Type[] requiredComponents) : base(world, requiredComponents)
+        protected Type[] RequiredComponents { get; private set; }
+        protected World World { get; private set; }
+        private protected HashSet<int> RegisteredEntities { get; private set; }
+
+        public System(World world, params Type[] requiredComponents)
         {
-             
+            RegisteredEntities = new HashSet<int>();
+            RequiredComponents = requiredComponents;
+            World = world;
         }
 
-        /// <summary>
-        /// Updates all the entities that match the signature of this <see cref="System"/> from the <see cref="World"/>
-        /// </summary>
-        public void UpdateEntities(GameTime gameTime)
+        public void DeleteEntity(int id)
         {
-            foreach (int entity in RegisteredEntities)
+            if (RegisteredEntities.Contains(id))
             {
-                UpdateEntity(gameTime, World.GetComponents(entity).GetComponents(RequiredComponents));
+                RegisteredEntities.Remove(id);
             }
         }
 
-        protected abstract void UpdateEntity(GameTime gameTime, List<Component> components);
+        /// <summary>
+        /// Evaluates <paramref name="entity"/>'s components and adds it to this <see cref="UpdateSystem"/> if it meets the signature,
+        /// Or removes it from this <see cref="UpdateSystem"/> if the entity was registered but no longer matches the signature
+        /// </summary>
+        public void UpdateEntityRegistration(int entity)
+        {
+            bool matches = Matches(entity);
+
+            if (RegisteredEntities.Contains(entity))
+            {
+                if (!matches)
+                    RegisteredEntities.Remove(entity);
+            }
+            else
+            {
+                if (matches)
+                    RegisteredEntities.Add(entity);
+            }
+        }
+
+        /// <returns>
+        /// <c>true</c> if the entity matches this <see cref="UpdateSystem"/>'s signature, <c>false</c> otherwise
+        /// </returns>
+        private bool Matches(int entity)
+        {
+            return World.GetComponents(entity).HasComponents(RequiredComponents);
+        }
     }
 }

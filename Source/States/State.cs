@@ -14,10 +14,5 @@ namespace BluishFramework
         {
             
         }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-
-        }
     }
 }

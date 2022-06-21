@@ -13,12 +13,14 @@ namespace BluishFramework
     {
         private Dictionary<int, ComponentCollection> _entities;
         private List<int> _entitesToRemove;
-        private Dictionary<Type, System> _systems;
+        private Dictionary<Type, UpdateSystem> _updateSystems;
+        private Dictionary<Type, DrawSystem> _drawSystems;
         private int _currentID;
 
         public World()
         {
-            _systems = new Dictionary<Type, System>();
+            _drawSystems = new Dictionary<Type, DrawSystem>();
+            _updateSystems = new Dictionary<Type, UpdateSystem>();
             _entities = new Dictionary<int, ComponentCollection>();
             _entitesToRemove = new List<int>();
             _currentID = 0;
@@ -49,35 +51,51 @@ namespace BluishFramework
 
         public ComponentCollection GetComponents(int entity)
         {
-            // TODO: Ensure entity exists
-            return _entities[entity];
+            _entities.TryGetValue(entity, out ComponentCollection componentCollection);
+            return componentCollection;
         }
 
         public void AddSystem<T>() where T : System
         {
-            _systems[typeof(T)] = (T)Activator.CreateInstance(typeof(T), this);
-        }
+            T system = (T)Activator.CreateInstance(typeof(T), this);
 
-        public T GetSystem<T>() where T : System
-        {
-            return (T)_systems[typeof(T)];
-        }
+            //_drawSystems.TryAdd(system.GetType(), system as DrawSystem);
+            _updateSystems.TryAdd(system.GetType(), system as UpdateSystem);
 
-        public void RemoveSystem<T>() where T : System
-        {
-            _systems.Remove(typeof(T));
-        }
-
-        public void Update(GameTime gameTime)
-        {
-            foreach (System system in _systems.Values)
+            foreach (int entity in _entities.Keys)
             {
-                system.UpdateEntities(gameTime);
+                system.UpdateEntityRegistration(entity);
+            }
+        }
+
+        //public T GetSystem<T>() where T : System
+        //{
+        //    return (T)_systems[typeof(T)];
+        //}
+
+        //public void RemoveSystem<T>() where T : System
+        //{
+        //    _systems.Remove(typeof(T));
+        //}
+
+        public void Update(/*GameTime gameTime*/)
+        {
+            foreach (UpdateSystem updateSystem in _updateSystems.Values)
+            {
+                updateSystem.UpdateEntities(/*gameTime*/);
             }
 
             foreach (int entity in _entitesToRemove)
             {
                 DestroyEntity(entity);
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (DrawSystem drawSystem in _drawSystems.Values)
+            {
+                drawSystem.DrawEntities(spriteBatch);
             }
         }
 
@@ -89,9 +107,13 @@ namespace BluishFramework
 
         private void UpdateEntityRegistration(int entity)
         {
-            foreach (System system in _systems.Values)
+            foreach (UpdateSystem updateSystem in _updateSystems.Values)
             {
-                system.UpdateEntityRegistration(entity);
+                updateSystem.UpdateEntityRegistration(entity);
+            }
+            foreach (DrawSystem drawSystem in _drawSystems.Values)
+            {
+                drawSystem.UpdateEntityRegistration(entity);
             }
         }
     }
