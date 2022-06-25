@@ -52,6 +52,8 @@ namespace BluishFramework
         /// <summary>
         /// Returns the <see cref="Component"/> of type <typeparamref name="T"/> from this <see cref="ComponentCollection"/>
         /// </summary>
+        /// <exception cref="KeyNotFoundException">
+        /// </exception>
         public T GetComponent<T>() where T : Component
         {
             return _components[typeof(T)] as T;
@@ -69,8 +71,8 @@ namespace BluishFramework
 
             foreach (Type componentType in componentTypes)
             {
-                _components.TryGetValue(componentType, out Component component);
-                components.AddComponent(component);
+                if (_components.TryGetValue(componentType, out Component component))
+                    components.AddComponent(component);
             }
 
             return components;

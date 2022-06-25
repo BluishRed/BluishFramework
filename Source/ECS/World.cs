@@ -37,7 +37,7 @@ namespace BluishFramework
 
             _entities.Add(_currentID++, componentCollection);
         }
-
+         
         public void RemoveEntity(int entity)
         {
             _entitesToRemove.Add(entity);
@@ -46,7 +46,7 @@ namespace BluishFramework
         public void AddComponent(int entity, Component component)
         {
             _entities[entity].AddComponent(component);
-            UpdateEntityRegistration(entity);
+            UpdateEntityRegistrationForAllSystems(entity);
         }
 
         public ComponentCollection GetComponents(int entity)
@@ -89,6 +89,8 @@ namespace BluishFramework
             {
                 DestroyEntity(entity);
             }
+
+            _entitesToRemove.Clear();
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -101,11 +103,18 @@ namespace BluishFramework
 
         private void DestroyEntity(int entity)
         {
-            _entitesToRemove.Remove(entity);
             _entities.Remove(entity);
+            foreach (UpdateSystem updateSystem in _updateSystems.Values)
+            {
+                updateSystem.RemoveEntity(entity);
+            }
+            foreach (DrawSystem drawSystem in _drawSystems.Values)
+            {
+                drawSystem.RemoveEntity(entity);
+            }
         }
 
-        private void UpdateEntityRegistration(int entity)
+        private void UpdateEntityRegistrationForAllSystems(int entity)
         {
             foreach (UpdateSystem updateSystem in _updateSystems.Values)
             {

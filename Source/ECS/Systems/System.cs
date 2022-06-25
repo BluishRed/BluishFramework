@@ -9,9 +9,18 @@ using Microsoft.Xna.Framework.Content;
 
 namespace BluishFramework
 {
+    /// <summary>
+    /// Provides logic to entities which have the relevant <see cref="Component"/>'s
+    /// </summary>
     public class System
     {
-        protected Type[] RequiredComponents { get; private set; }
+        /// <summary>
+        /// The <see cref="Type"/>'s of <see cref="Component"/>'s that entities must have to be registered to this <see cref="System"/>
+        /// </summary>
+        protected Type[] RequiredComponents { get; private set; } 
+        /// <summary>
+        /// The <see cref="World"/> that this <see cref="System"/> operates from
+        /// </summary>
         protected World World { get; private set; }
         private protected HashSet<int> RegisteredEntities { get; private set; }
 
@@ -22,12 +31,13 @@ namespace BluishFramework
             World = world;
         }
 
-        public void DeleteEntity(int id)
+        /// <summary>
+        /// Removes 
+        /// </summary>
+        /// <param name="id"></param>
+        public void RemoveEntity(int id)
         {
-            if (RegisteredEntities.Contains(id))
-            {
-                RegisteredEntities.Remove(id);
-            }
+            RegisteredEntities.Remove(id);
         }
 
         /// <summary>
@@ -50,9 +60,9 @@ namespace BluishFramework
             }
         }
 
-        /// <returns>
-        /// <c>true</c> if the entity matches this <see cref="UpdateSystem"/>'s signature, <c>false</c> otherwise
-        /// </returns>
+        /// <summary>
+        /// Returns <c>true</c> if the entity matches this <see cref="UpdateSystem"/>'s signature, <c>false</c> otherwise
+        /// </summary>
         private bool Matches(int entity)
         {
             return World.GetComponents(entity).HasComponents(RequiredComponents);
