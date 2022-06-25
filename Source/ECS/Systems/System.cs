@@ -32,12 +32,11 @@ namespace BluishFramework
         }
 
         /// <summary>
-        /// Removes 
+        /// Unregisters an entity from this <see cref="System"/>
         /// </summary>
-        /// <param name="id"></param>
-        public void RemoveEntity(int id)
+        public void UnregisterEntity(int entity)
         {
-            RegisteredEntities.Remove(id);
+            RegisteredEntities.Remove(entity);
         }
 
         /// <summary>
