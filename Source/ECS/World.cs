@@ -14,8 +14,8 @@ namespace BluishFramework
     /// </summary>
     public class World
     {
-        private Dictionary<int, ComponentCollection> _entities;
-        private List<int> _entitesToRemove;
+        private Dictionary<Entity, ComponentCollection> _entities;
+        private List<Entity> _entitesToRemove;
         private Dictionary<Type, UpdateSystem> _updateSystems;
         private Dictionary<Type, DrawSystem> _drawSystems;
         private int _currentID;
@@ -24,8 +24,8 @@ namespace BluishFramework
         {
             _drawSystems = new Dictionary<Type, DrawSystem>();
             _updateSystems = new Dictionary<Type, UpdateSystem>();
-            _entities = new Dictionary<int, ComponentCollection>();
-            _entitesToRemove = new List<int>();
+            _entities = new Dictionary<Entity, ComponentCollection>();
+            _entitesToRemove = new List<Entity>();
             _currentID = 0;
         }
 
@@ -53,7 +53,7 @@ namespace BluishFramework
         /// <param name="entity">
         /// Entity to remove
         /// </param>
-        public void RemoveEntity(int entity)
+        public void RemoveEntity(Entity entity)
         {
             _entitesToRemove.Add(entity);
         }
@@ -61,7 +61,7 @@ namespace BluishFramework
         /// <summary>
         /// Adds <paramref name="component"/> to <paramref name="entity"/>
         /// </summary>
-        public void AddComponent(int entity, Component component)
+        public void AddComponent(Entity entity, Component component)
         {
             _entities[entity].AddComponent(component);
             UpdateEntityRegistrationForAllSystems(entity);
@@ -70,7 +70,7 @@ namespace BluishFramework
         /// <summary>
         /// Returns <paramref name="entity"/>'s <see cref="Component"/>'s as a <see cref="ComponentCollection"/>
         /// </summary>
-        public ComponentCollection GetComponents(int entity)
+        public ComponentCollection GetComponents(Entity entity)
         {
             _entities.TryGetValue(entity, out ComponentCollection componentCollection);
             return componentCollection;
@@ -83,10 +83,16 @@ namespace BluishFramework
         {
             T system = (T)Activator.CreateInstance(typeof(T), this);
 
-            //_drawSystems.TryAdd(system.GetType(), system as DrawSystem);
-            _updateSystems.TryAdd(system.GetType(), system as UpdateSystem);
+            if (typeof(T).IsSubclassOf(typeof(DrawSystem)))
+            {
+                _drawSystems.TryAdd(system.GetType(), system as DrawSystem);
+            }
+            else if (typeof(T).IsSubclassOf(typeof(UpdateSystem)))
+            {
+                _updateSystems.TryAdd(system.GetType(), system as UpdateSystem);
+            }
 
-            foreach (int entity in _entities.Keys)
+            foreach (Entity entity in _entities.Keys)
             {
                 system.UpdateEntityRegistration(entity);
             }
@@ -106,14 +112,14 @@ namespace BluishFramework
         /// <summary>
         /// Updates every <see cref="UpdateSystem"/> in this <see cref="World"/>
         /// </summary>
-        public void Update(/*GameTime gameTime*/)
+        public void Update(GameTime gameTime)
         {
             foreach (UpdateSystem updateSystem in _updateSystems.Values)
             {
-                updateSystem.UpdateEntities(/*gameTime*/);
+                updateSystem.UpdateEntities(gameTime);
             }
 
-            foreach (int entity in _entitesToRemove)
+            foreach (Entity entity in _entitesToRemove)
             {
                 DestroyEntity(entity);
             }
@@ -133,7 +139,7 @@ namespace BluishFramework
             }
         }
 
-        private void DestroyEntity(int entity)
+        private void DestroyEntity(Entity entity)
         {
             _entities.Remove(entity);
             foreach (UpdateSystem updateSystem in _updateSystems.Values)
@@ -146,7 +152,7 @@ namespace BluishFramework
             }
         }
 
-        private void UpdateEntityRegistrationForAllSystems(int entity)
+        private void UpdateEntityRegistrationForAllSystems(Entity entity)
         {
             foreach (UpdateSystem updateSystem in _updateSystems.Values)
             {

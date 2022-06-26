@@ -22,11 +22,11 @@ namespace BluishFramework
         /// The <see cref="World"/> that this <see cref="System"/> operates from
         /// </summary>
         protected World World { get; private set; }
-        private protected HashSet<int> RegisteredEntities { get; private set; }
+        private protected HashSet<Entity> RegisteredEntities { get; private set; }
 
         public System(World world, params Type[] requiredComponents)
         {
-            RegisteredEntities = new HashSet<int>();
+            RegisteredEntities = new HashSet<Entity>();
             RequiredComponents = requiredComponents;
             World = world;
         }
@@ -34,7 +34,7 @@ namespace BluishFramework
         /// <summary>
         /// Unregisters an entity from this <see cref="System"/>
         /// </summary>
-        public void UnregisterEntity(int entity)
+        public void UnregisterEntity(Entity entity)
         {
             RegisteredEntities.Remove(entity);
         }
@@ -43,7 +43,7 @@ namespace BluishFramework
         /// Evaluates <paramref name="entity"/>'s components and adds it to this <see cref="UpdateSystem"/> if it meets the signature,
         /// Or removes it from this <see cref="UpdateSystem"/> if the entity was registered but no longer matches the signature
         /// </summary>
-        public void UpdateEntityRegistration(int entity)
+        public void UpdateEntityRegistration(Entity entity)
         {
             bool matches = Matches(entity);
 
@@ -62,7 +62,7 @@ namespace BluishFramework
         /// <summary>
         /// Returns <c>true</c> if the entity matches this <see cref="UpdateSystem"/>'s signature, <c>false</c> otherwise
         /// </summary>
-        private bool Matches(int entity)
+        private bool Matches(Entity entity)
         {
             return World.GetComponents(entity).HasComponents(RequiredComponents);
         }

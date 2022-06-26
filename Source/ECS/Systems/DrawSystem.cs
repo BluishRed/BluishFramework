@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace BluishFramework
 {
-    abstract class DrawSystem : System
+    public abstract class DrawSystem : System
     {
         public DrawSystem(World world, params Type[] requiredComponents) : base(world, requiredComponents)
         {
@@ -21,12 +21,12 @@ namespace BluishFramework
         /// </summary>
         public void DrawEntities(SpriteBatch spriteBatch)
         {
-            foreach (int entity in RegisteredEntities)
+            foreach (Entity entity in RegisteredEntities)
             {
-                DrawEntity(spriteBatch, World.GetComponents(entity).GetMatchingComponents(RequiredComponents));
+                DrawEntity(spriteBatch, entity, World.GetComponents(entity).GetMatchingComponents(RequiredComponents));
             }
         }
 
-        protected abstract void DrawEntity(SpriteBatch spriteBatch, ComponentCollection components);
+        protected abstract void DrawEntity(SpriteBatch spriteBatch, Entity entity, ComponentCollection components);
     }
 }

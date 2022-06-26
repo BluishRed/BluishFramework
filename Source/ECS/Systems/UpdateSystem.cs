@@ -19,14 +19,14 @@ namespace BluishFramework
         /// <summary>
         /// Updates all the entities that match the signature of this <see cref="UpdateSystem"/> from the <see cref="World"/>
         /// </summary>
-        public void UpdateEntities(/*GameTime gameTime*/)
+        public void UpdateEntities(GameTime gameTime)
         {
-            foreach (int entity in RegisteredEntities)
+            foreach (Entity entity in RegisteredEntities)
             {
-                UpdateEntity(/*gameTime, */entity, World.GetComponents(entity).GetMatchingComponents(RequiredComponents));
+                UpdateEntity(gameTime, entity, World.GetComponents(entity).GetMatchingComponents(RequiredComponents));
             }
         }
 
-        protected abstract void UpdateEntity(/*GameTime gameTime, */int entity, ComponentCollection components);
+        protected abstract void UpdateEntity(GameTime gameTime, Entity entity, ComponentCollection components);
     }
 }

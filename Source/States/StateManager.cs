@@ -12,6 +12,15 @@ namespace BluishFramework
         private static Stack<State> _stateStack = new Stack<State>();
         private static State _initalState;
 
+        /// <summary>
+        /// The state that is currently being processed
+        /// </summary>
+        public static State CurrentState
+        {
+            get { return _stateStack.Peek(); }
+            private set { _stateStack.Push(value); }
+        }
+
         public static void Initialise()
         {
             ChangeState<SplashScreen>();
@@ -22,19 +31,10 @@ namespace BluishFramework
             _initalState = new T();
         }
 
-        public static void ChangeToInitialState()
+        private static void ChangeToInitialState()
         {
             if (_initalState != null)
                 ChangeState(_initalState);
-        }
-
-        /// <summary>
-        /// The state that is currently being processed
-        /// </summary>
-        public static State CurrentState
-        {
-            get { return _stateStack.Peek(); }
-            private set { _stateStack.Push(value); }
         }
 
         public static void ChangeState<T>() where T : State, new()
