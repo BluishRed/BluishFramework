@@ -18,12 +18,14 @@ namespace BluishFramework
         private List<Entity> _entitesToRemove;
         private Dictionary<Type, UpdateSystem> _updateSystems;
         private Dictionary<Type, DrawSystem> _drawSystems;
+        private Dictionary<Type, LoadSystem> _loadSystems;
         private int _currentID;
 
         public World()
         {
             _drawSystems = new Dictionary<Type, DrawSystem>();
             _updateSystems = new Dictionary<Type, UpdateSystem>();
+            _loadSystems = new Dictionary<Type, LoadSystem>();
             _entities = new Dictionary<Entity, ComponentCollection>();
             _entitesToRemove = new List<Entity>();
             _currentID = 0;
@@ -91,6 +93,10 @@ namespace BluishFramework
             {
                 _updateSystems.TryAdd(system.GetType(), system as UpdateSystem);
             }
+            else if (typeof(T).IsSubclassOf(typeof(LoadSystem)))
+            {
+                _loadSystems.TryAdd(system.GetType(), system as LoadSystem);
+            }
 
             foreach (Entity entity in _entities.Keys)
             {
@@ -107,7 +113,6 @@ namespace BluishFramework
         //{
         //    _systems.Remove(typeof(T));
         //}
-
 
         /// <summary>
         /// Updates every <see cref="UpdateSystem"/> in this <see cref="World"/>
@@ -139,6 +144,14 @@ namespace BluishFramework
             }
         }
 
+        protected void LoadContent(ContentManager content)
+        {
+            foreach (LoadSystem loadSystem in _loadSystems.Values)
+            {
+                loadSystem.LoadEntities(content);
+            }
+        }
+
         private void DestroyEntity(Entity entity)
         {
             _entities.Remove(entity);
@@ -161,6 +174,10 @@ namespace BluishFramework
             foreach (DrawSystem drawSystem in _drawSystems.Values)
             {
                 drawSystem.UpdateEntityRegistration(entity);
+            }
+            foreach (LoadSystem loadSystem in _loadSystems.Values)
+            {
+                loadSystem.UpdateEntityRegistration(entity);
             }
         }
     }

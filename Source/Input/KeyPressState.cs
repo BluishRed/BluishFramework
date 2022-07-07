@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace BluishFramework
 {
-    public class SplashScreen : State
+    public enum KeyPressState
     {
-
+        JustPressed,
+        Held
     }
 }

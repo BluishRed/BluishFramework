@@ -23,7 +23,7 @@ namespace BluishFramework
         {
             foreach (Entity entity in RegisteredEntities)
             {
-                UpdateEntity(gameTime, entity, World.GetComponents(entity).GetMatchingComponents(RequiredComponents));
+                UpdateEntity(gameTime, entity, World.GetComponents(entity));
             }
         }
 

@@ -59,25 +59,6 @@ namespace BluishFramework
         }
 
         /// <summary>
-        /// Returns a new <see cref="ComponentCollection"/> with only the components from this <see cref="ComponentCollection"/> that match the <see cref="Type"/>'s of <paramref name="componentTypes"/>
-        /// </summary>
-        /// <param name="componentTypes">
-        /// A list containing the <see cref="Type"/>'s of <see cref="Component"/>'s to put in the returned <see cref="ComponentCollection"/>
-        /// </param>
-        public ComponentCollection GetMatchingComponents(Type[] componentTypes)
-        {
-            ComponentCollection components = new ComponentCollection();
-
-            foreach (Type componentType in componentTypes)
-            {
-                if (_components.TryGetValue(componentType, out Component component))
-                    components.AddComponent(component);
-            }
-
-            return components;
-        }
-
-        /// <summary>
         /// Returns <c>true</c> if this <see cref="ComponentCollection"/> contains a <see cref="Component"/> of type <typeparamref name="T"/>, <c>false</c> otherwise
         /// </summary>
         public bool HasComponent<T>() where T : Component
