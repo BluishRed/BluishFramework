@@ -35,9 +35,25 @@ namespace BluishFramework
 
         public static bool IsKeyJustPressed(Keys key)
         {
-            if (_pressedKeys.TryGetValue(key, out KeyPressState keyPressState))
+            if (_pressedKeys.TryGetValue(key, out KeyPressState currentState))
             {
-                return keyPressState == KeyPressState.JustPressed;
+                return currentState == KeyPressState.JustPressed;
+            }
+            return false;
+        }
+
+        public static bool IsKeyInState(Keys key, KeyPressState keyPressState)
+        {
+            if (_pressedKeys.TryGetValue(key, out KeyPressState currentState))
+            {
+                if (keyPressState == KeyPressState.Held)
+                {
+                    return true;
+                }
+                else
+                {
+                    return keyPressState == currentState;
+                }     
             }
             return false;
         }
