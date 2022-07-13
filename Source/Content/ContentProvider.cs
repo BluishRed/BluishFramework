@@ -12,6 +12,7 @@ namespace BluishFramework
     public static class ContentProvider
     {
         public static ContentManager Content { get; set; }
+        public static string RootDirectory => Content.RootDirectory;
 
         public static ContentManager GetContentManager()
         {

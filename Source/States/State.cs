@@ -10,12 +10,16 @@ namespace BluishFramework
 {
     public abstract class State : World
     {
-
-        ContentManager _content;
+        protected ContentManager Content { get; private set; }
 
         public State()
         {
-            _content = ContentProvider.GetContentManager();
+            Content = ContentProvider.GetContentManager();
+        }
+
+        public virtual void LoadContent()
+        {
+            LoadContent(Content);
         }
 
         public abstract void AddEntities();
@@ -28,14 +32,9 @@ namespace BluishFramework
             AddSystems();
         }
 
-        public void LoadContent()
-        {
-            LoadContent(_content);
-        }
-
         public void UnloadContent()
         {
-            _content.Unload();
+            Content.Unload();
         }
     }
 }

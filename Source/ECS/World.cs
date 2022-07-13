@@ -30,7 +30,7 @@ namespace BluishFramework
             _entitesToRemove = new List<Entity>();
             _currentID = 0;
         }
-
+         
         /// <summary>
         /// Adds an entity to this <see cref="World"/>
         /// </summary>
@@ -48,7 +48,7 @@ namespace BluishFramework
 
             _entities.Add(_currentID++, componentCollection);
         }
-        
+
         /// <summary>
         /// Removes <paramref name="entity"/> from this <see cref="World"/>
         /// </summary>
@@ -69,6 +69,7 @@ namespace BluishFramework
             UpdateEntityRegistrationForAllSystems(entity);
         }
 
+
         /// <summary>
         /// Returns <paramref name="entity"/>'s <see cref="Component"/>'s as a <see cref="ComponentCollection"/>
         /// </summary>
@@ -79,21 +80,19 @@ namespace BluishFramework
         }
         
         /// <summary>
-        /// Adds a system of type <typeparamref name="T"/> to this <see cref="World"/>
+        /// Adds <paramref name="system"/> to this world
         /// </summary>
-        public void AddSystem<T>() where T : System
+        public void AddSystem(System system)
         {
-            T system = (T)Activator.CreateInstance(typeof(T), this);
-
-            if (typeof(T).IsSubclassOf(typeof(DrawSystem)))
+            if (system as DrawSystem is not null)
             {
                 _drawSystems.TryAdd(system.GetType(), system as DrawSystem);
             }
-            else if (typeof(T).IsSubclassOf(typeof(UpdateSystem)))
+            else if (system as UpdateSystem is not null)
             {
                 _updateSystems.TryAdd(system.GetType(), system as UpdateSystem);
             }
-            else if (typeof(T).IsSubclassOf(typeof(LoadSystem)))
+            else if (system as LoadSystem is not null)
             {
                 _loadSystems.TryAdd(system.GetType(), system as LoadSystem);
             }
@@ -115,9 +114,9 @@ namespace BluishFramework
         //}
 
         /// <summary>
-        /// Updates every <see cref="UpdateSystem"/> in this <see cref="World"/>
+        /// Runs every <see cref="UpdateSystem"/> in this <see cref="World"/>
         /// </summary>
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
             foreach (UpdateSystem updateSystem in _updateSystems.Values)
             {
@@ -133,10 +132,9 @@ namespace BluishFramework
         }
 
         /// <summary>
-        /// Draws every <see cref="DrawSystem"/> in this <see cref="World"/>
+        /// Runs every <see cref="DrawSystem"/> in this <see cref="World"/>
         /// </summary>
-        /// <param name="spriteBatch"></param>
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             foreach (DrawSystem drawSystem in _drawSystems.Values)
             {
@@ -144,14 +142,17 @@ namespace BluishFramework
             }
         }
 
-        protected void LoadContent(ContentManager content)
+        /// <summary>
+        /// Runs every <see cref="LoadSystem"/> in this <see cref="World"/>
+        /// </summary>
+        public virtual void LoadContent(ContentManager content)
         {
             foreach (LoadSystem loadSystem in _loadSystems.Values)
             {
                 loadSystem.LoadEntities(content);
             }
         }
-
+        
         private void DestroyEntity(Entity entity)
         {
             _entities.Remove(entity);
@@ -162,6 +163,10 @@ namespace BluishFramework
             foreach (DrawSystem drawSystem in _drawSystems.Values)
             {
                 drawSystem.UnregisterEntity(entity);
+            }
+            foreach (LoadSystem loadSystem in _loadSystems.Values)
+            {
+                loadSystem.UnregisterEntity(entity);
             }
         }
 
