@@ -16,6 +16,7 @@ namespace BluishFramework
     {
         private Dictionary<Entity, ComponentCollection> _entities;
         private List<Entity> _entitesToRemove;
+        private Stack<Entity> _entitiesToReuse;
         private Dictionary<Type, UpdateSystem> _updateSystems;
         private Dictionary<Type, DrawSystem> _drawSystems;
         private Dictionary<Type, LoadSystem> _loadSystems;
@@ -28,6 +29,7 @@ namespace BluishFramework
             _loadSystems = new Dictionary<Type, LoadSystem>();
             _entities = new Dictionary<Entity, ComponentCollection>();
             _entitesToRemove = new List<Entity>();
+            _entitiesToReuse = new Stack<Entity>();
             _currentID = 0;
         }
          
@@ -46,7 +48,14 @@ namespace BluishFramework
                 componentCollection.AddComponent(component);
             }
 
-            _entities.Add(_currentID++, componentCollection);
+            if (_entitiesToReuse.Count > 0)
+            {
+                _entities.Add(_entitiesToReuse.Pop(), componentCollection);
+            }
+            else
+            {
+                _entities.Add(_currentID++, componentCollection);
+            }
         }
 
         /// <summary>
@@ -168,6 +177,7 @@ namespace BluishFramework
             {
                 loadSystem.UnregisterEntity(entity);
             }
+            _entitiesToReuse.Push(entity);
         }
 
         private void UpdateEntityRegistrationForAllSystems(Entity entity)

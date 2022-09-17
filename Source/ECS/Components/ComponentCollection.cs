@@ -89,5 +89,25 @@ namespace BluishFramework
 
             return true;
         }
+
+        /// <summary>
+        /// Returns a new <see cref="ComponentCollection"/> with only the components in it that match a <see cref="Component"/> <see cref="Type"/> from <paramref name="types"/>
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public ComponentCollection FilterCollection(params Type[] types)
+        {
+            ComponentCollection collection = new ComponentCollection();
+
+            foreach (Type type in types)
+            {
+                if (_components.ContainsKey(type))
+                {
+                    collection.AddComponent(_components[type]);
+                }
+            }
+
+            return collection;
+        }
     }
 }

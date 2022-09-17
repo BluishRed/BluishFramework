@@ -57,5 +57,10 @@ namespace BluishFramework
             }
             return false;
         }
+
+        public static bool IsKeyInState((Keys, KeyPressState) inputCondition)
+        {
+            return IsKeyInState(inputCondition.Item1, inputCondition.Item2);
+        }
     }
 }
